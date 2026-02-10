@@ -3,7 +3,23 @@ import Combine
 
 var subscriptions = Set<AnyCancellable>()
 
-<#Add your code here#>
+example(of: "Notification") {
+    
+    let center = NotificationCenter.default
+    let myNotification = Notification.Name("MyNotification")
+    
+    let publisher = center
+        .publisher(for: myNotification, object: nil)
+    
+    let subscription = publisher
+        .print()
+        .sink { notication in
+            print("Notification \"\(notication.name.rawValue)\" received from a publisher!")
+        }
+              
+    center.post(name: myNotification, object: nil)
+    subscription.cancel()
+}
 
 /// Copyright (c) 2020 Razeware LLC
 ///
