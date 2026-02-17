@@ -57,8 +57,36 @@ example(of: "Create a phone number lookup") {
   }
 
 
-
+  /// 1. P. Receive an string of 10 characters
+  /// 2. Look at the numbers in a data structure
+  /// 3.1. Subscribe to conver input to numbers
+  ///  3.2 replace nil with 0
+  ///
+  /// 4.Format 3 digits for country code + 7 phone digits
+  /// 5.Dial phone number
+  ///
+  let happyPhoneNumber = "6035551234"
+  let happyLettersNumber = "603JJJ1234"
+  let badPhoneNumber = "603555123"
   
+  //let phoneNumberChars: [String] = badPhoneNumber.map({ String($0) })
+  
+  happyLettersNumber.publisher
+    .map({ character in
+      return String(character)
+    })
+    .map({ value in
+      let number = convert(phoneNumber: value) ?? 0
+      return number
+    })
+    .collect(10)
+    .map({ tenNumbers in
+      format(digits: tenNumbers)
+    })
+    .sink { value in
+      print(dial(phoneNumber: value))
+    }
+    .store(in: &subscriptions)
 }
 
 /// Copyright (c) 2020 Razeware LLC
