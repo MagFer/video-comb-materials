@@ -65,20 +65,50 @@ example(of: "Create a phone number lookup") {
   /// 4.Format 3 digits for country code + 7 phone digits
   /// 5.Dial phone number
   ///
-  let happyPhoneNumber = "6035551234"
-  let happyLettersNumber = "603JJJ1234"
-  let badPhoneNumber = "603555123"
+
+  let input = PassthroughSubject<String, Never>()
   
-  //let phoneNumberChars: [String] = badPhoneNumber.map({ String($0) })
+  input
+    .map(convert)
+    .replaceNil(with: 0)
+    .collect(10)
+    .map(format)
+    .map(dial)
+    .sink(receiveValue: { print($0) })
+    .store(in: &subscriptions)
   
-  happyLettersNumber.publisher
+//    .map { character in
+//      convert(phoneNumber: String(character))
+//    }
+//    .map { tenNumbers in
+//      format(digits: tenNumbers)
+//    }
+    //.store(in: &subscriptions)
+    
+  "0!1234567".forEach {
+    input.send(String($0))
+  }
+    
+  "4085554321".forEach {
+  input.send(String($0))
+  }
+    
+  "A1BJKLDGEH".forEach {
+  input.send("\($0)")
+  }
+  
+  print("\nMy solution:\n")
+  
+  let numberPublisher = PassthroughSubject<String, Never>()
+  numberPublisher
     .map({ character in
       return String(character)
     })
     .map({ value in
-      let number = convert(phoneNumber: value) ?? 0
+      let number = convert(phoneNumber: value)
       return number
     })
+    .replaceNil(with: 0)
     .collect(10)
     .map({ tenNumbers in
       format(digits: tenNumbers)
@@ -87,6 +117,19 @@ example(of: "Create a phone number lookup") {
       print(dial(phoneNumber: value))
     }
     .store(in: &subscriptions)
+  
+  let happyPhoneNumber = "6035551234"
+  happyPhoneNumber.forEach { character in
+    numberPublisher.send(String(character))
+  }
+  let happyLettersNumber = "603JJJ1234"
+  happyLettersNumber.forEach { character in
+    numberPublisher.send(String(character))
+  }
+  let badPhoneNumber = "603555123"
+  badPhoneNumber.forEach { character in
+    numberPublisher.send(String(character))
+  }
 }
 
 /// Copyright (c) 2020 Razeware LLC
