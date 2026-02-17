@@ -3,7 +3,100 @@ import Combine
 
 var subscriptions = Set<AnyCancellable>()
 
-<#Add your code here#>
+
+/// Subscribe using sink
+///
+example(of: "Just") {
+    let just = Just("Hellow World")
+    
+    just
+        .sink { completion in
+            print("Completion: \(completion)")
+        } receiveValue: { value in
+            print("Received Value: \(value)")
+        }
+        .store(in: &subscriptions)
+}
+
+example(of: "assing(to:on:)") {
+    class SomeObject {
+        var value: String = "" {
+            didSet {
+                print("Value is now \(value)")
+            }
+        }
+    }
+    
+    let object = SomeObject()
+    
+    /// Subscribe using Assing by KVO
+    ///
+    ["Hello", "World"].publisher
+        .assign(to: \.value, on: object)
+        .store(in: &subscriptions)
+    
+    /// Subscribe using Assing by sink
+    ///
+    ["Hello", "World"].publisher
+        .sink(receiveValue: { value in
+            print("sink: \(value)")
+        })
+        .store(in: &subscriptions)
+}
+
+example(of: "PassthroughSubject") {
+    let subject = PassthroughSubject<String, Never>()
+    
+    subject
+        .sink(receiveValue: { value in
+            print("Received Value: \(value)")
+        })
+        .store(in: &subscriptions)
+    
+    subject.send("Hello")
+    subject.send("World")
+    subject.send(completion: .finished)
+    subject.send("Still there?")
+}
+
+example(of: "CurrentValueSubject") {
+    let subject = CurrentValueSubject<Int, Never>(0)
+    
+    subject
+        .print()
+        .sink(receiveValue: { value in
+            //print("Received Value: \(value)")
+        })
+        .store(in: &subscriptions)
+    
+    print(subject.value)
+    
+    subject.send(1)
+    subject.send(2)
+    
+    print(subject.value)
+    
+    subject.send(completion: .finished)
+}
+
+example(of: "Type erasure") {
+    let subject = PassthroughSubject<Int, Never>()
+    
+    let publisher = subject.eraseToAnyPublisher()
+    
+    // A generic publisher forbbits from sending events
+    // publisher.send(0)
+    
+    publisher
+        .sink { value in
+            print("Received Value: \(value)")
+        }
+        .store(in: &subscriptions)
+    
+    subject.send(0)
+}
+
+
 
 /// Copyright (c) 2020 Razeware LLC
 ///
