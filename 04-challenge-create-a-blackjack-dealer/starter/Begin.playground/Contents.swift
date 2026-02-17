@@ -19,13 +19,15 @@ example(of: "Create a Blackjack card dealer") {
     }
     
     // Add code to update dealtHand here
+    /*
     let handValue: Int = hand.reduce(into: 0) { partialResult, card in
       partialResult += card.1
     }
+    */
     
     let blackJacMaxHandvalue = 21
     
-    if handValue > blackJacMaxHandvalue {
+    if hand.points > blackJacMaxHandvalue {
       print("Your hand is: \(hand)")
       dealtHand.send(completion: .failure(.busted))
     } else {
@@ -36,7 +38,7 @@ example(of: "Create a Blackjack card dealer") {
   // Add subscription to dealtHand here
   
   dealtHand
-    .print()
+    //.print()
     .sink { completion in
       switch completion {
       case .finished:
@@ -45,7 +47,8 @@ example(of: "Create a Blackjack card dealer") {
         print("Error: \(error)")
       }
     } receiveValue: { hand in
-      print("Your hand: \(hand)\nis still in the game")
+      print("Your hand is still in the game")
+      print(hand.cardString, "for", hand.points, "points")
     }
     .store(in: &subscriptions)
   
