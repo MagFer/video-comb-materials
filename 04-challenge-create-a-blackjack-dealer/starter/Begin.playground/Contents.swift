@@ -19,11 +19,35 @@ example(of: "Create a Blackjack card dealer") {
     }
     
     // Add code to update dealtHand here
+    let handValue: Int = hand.reduce(into: 0) { partialResult, card in
+      partialResult += card.1
+    }
     
+    let blackJacMaxHandvalue = 21
+    
+    if handValue > blackJacMaxHandvalue {
+      print("Your hand is: \(hand)")
+      dealtHand.send(completion: .failure(.busted))
+    } else {
+      dealtHand.send(hand)
+    }
   }
   
   // Add subscription to dealtHand here
   
+  dealtHand
+    .print()
+    .sink { completion in
+      switch completion {
+      case .finished:
+        break
+      case .failure(let error):
+        print("Error: \(error)")
+      }
+    } receiveValue: { hand in
+      print("Your hand: \(hand)\nis still in the game")
+    }
+    .store(in: &subscriptions)
   
   deal(3)
 }
