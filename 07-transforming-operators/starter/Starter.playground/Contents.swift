@@ -3,7 +3,48 @@ import Combine
 
 var subscriptions = Set<AnyCancellable>()
 
-<#Add your code here#>
+example(of: "collect") {
+  ["A", "B", "C", "D", "E"].publisher
+    .collect(2)
+    .sink { completion in
+      print(completion)
+    } receiveValue: { value in
+      print(value)
+    }
+    .store(in: &subscriptions)
+}
+
+example(of: "map") {
+  
+  let formatter = NumberFormatter()
+  formatter.numberStyle = .spellOut
+  
+  [123, 4, 56].publisher
+    .map { integer in
+      formatter.string(from: NSNumber(integerLiteral: integer)) ?? "Unknown"
+    }
+    .sink(receiveValue: { print($0) })
+    .store(in: &subscriptions)
+  
+}
+
+example(of: "replace nil") {
+  
+  ["a", nil, "C"].publisher
+    .replaceNil(with: "-")
+    .map { "\($0)" }
+    .sink(receiveValue: { print($0) })
+    .store(in: &subscriptions)
+}
+
+example(of: "replace empty") {
+  let empty = Empty<Int, Never>()
+  
+  empty
+    .replaceEmpty(with: 1)
+    .sink(receiveValue: { print($0) })
+    .store(in: &subscriptions)
+}
 
 /// Copyright (c) 2020 Razeware LLC
 ///
