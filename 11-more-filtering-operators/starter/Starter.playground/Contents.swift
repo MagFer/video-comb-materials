@@ -34,3 +34,82 @@ var subscriptions = Set<AnyCancellable>()
 /// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 /// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 /// THE SOFTWARE.
+///
+
+example(of: "first(where:)") {
+  let numbers = (1...9).publisher
+  
+  numbers
+    .print()
+    .first { number in
+      number % 2 == 0
+    }
+    .sink { completion in
+      print("Completed with : \(completion)")
+    } receiveValue: { value in
+      print("The first even number is \(value)")
+    }
+    .store(in: &subscriptions)
+
+}
+
+example(of: "last(where:)") {
+  let numbers = (1...9).publisher
+  
+  numbers
+    .last { number in
+      number % 2 == 0
+    }
+    .sink { completion in
+      print("Completed with : \(completion)")
+    } receiveValue: { value in
+      print("The first even number is \(value)")
+    }
+    .store(in: &subscriptions)
+}
+
+example(of: "last(where:)") {
+  let numbers = PassthroughSubject<Int, Never>()
+  
+  numbers
+    .last { number in
+      number % 2 == 0
+    }
+    .sink { completion in
+      print("Completed with : \(completion)")
+    } receiveValue: { value in
+      print("The first even number is \(value)")
+    }
+    .store(in: &subscriptions)
+  
+  numbers.send(1)
+  numbers.send(2)
+  numbers.send(3)
+  numbers.send(4)
+  numbers.send(5)
+  numbers.send(completion: .finished)
+}
+
+example(of: "Prefix") {
+  let numbers = (1...10).publisher
+  
+  numbers
+    .prefix(3)
+    .sink { completion in
+      print("Completed with : \(completion)")
+    } receiveValue: { value in
+      print("The first 3 numbers are \(value)")
+    }
+    .store(in: &subscriptions)
+}
+
+example(of: "Drop") {
+  let numbers = (1...10).publisher
+  
+  numbers
+    .drop { number in
+      number % 5 == 0
+    }
+    .sink(receiveValue: { print($0) })
+    .store(in: &subscriptions)
+}
