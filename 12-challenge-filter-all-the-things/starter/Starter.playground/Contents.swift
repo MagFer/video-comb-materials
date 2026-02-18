@@ -3,15 +3,17 @@ import Combine
 
 var subscriptions = Set<AnyCancellable>()
 
+example(of: "Challenge - Filtering all the things!") {
 let numbers = (1...100).publisher
 
 numbers
-  .drop(while: { $0 < 50 })
-  .filter { $0.isMultiple(of: 2) }
+  //.drop(while: { $0 < 50 })
+  .dropFirst(50)
   .prefix(20)
+  .filter { $0.isMultiple(of: 2) }
   .sink(receiveValue: { print("Received: \($0)") })
   .store(in: &subscriptions)
-
+}
   
 
 /// Copyright (c) 2020 Razeware LLC
